@@ -1,0 +1,18 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:limitededittext="http://schemas.android.com/apk/res/com.example.limitededittext"  
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity" >
+
+    <com.example.limitededittext.control.LimitedEditTextControl 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        limitededittext:maxLength="10"
+        limitededittext:background="@drawable/limitedet_seletor"
+        ></com.example.limitededittext.control.LimitedEditTextControl>
+</RelativeLayout>

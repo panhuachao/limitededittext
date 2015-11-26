@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+     <declare-styleable name="limitededittext">  
+        <!--提示语 -->
+        <attr name="hint" format="string|reference" />    
+        <!--最小行数 -->
+        <attr name="minLines" format="integer" />  
+        <!--最大行数 -->  
+        <attr name="maxLines" format="integer" />
+        <!--是否单行-->  
+        <attr name="singleLine" format="boolean" />
+        <!--最大数字 -->
+        <attr name="maxLength" format="integer" />  
+         <!--背景 -->
+        <attr name="background" format="reference" /> 
+        <!--编辑框字体大小 -->
+        <attr name="textSize" format="float" />
+        <!--提示字体大小 -->
+        <attr name="tipTextSize" format="float" />
+     </declare-styleable>
+</resources>
