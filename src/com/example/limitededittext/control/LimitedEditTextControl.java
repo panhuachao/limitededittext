@@ -48,8 +48,8 @@ public class LimitedEditTextControl extends RelativeLayout {
 	    int minline = typeArray.getInteger(R.styleable.limitededittext_minLines,0);
 	    int maxline = typeArray.getInteger(R.styleable.limitededittext_maxLines,0);
 	    int background = typeArray.getResourceId(R.styleable.limitededittext_background,0);
-	    float textSize = typeArray.getFloat(R.styleable.limitededittext_textSize,0.0f);
-	    float tiptextSize = typeArray.getFloat(R.styleable.limitededittext_tipTextSize,0.0f);
+	    float textSize = typeArray.getDimension(R.styleable.limitededittext_textSize,0.0f);
+	    float tiptextSize = typeArray.getDimension(R.styleable.limitededittext_tipTextSize,0.0f);
 	    
 	    maxLength = typeArray.getInteger(R.styleable.limitededittext_maxLength,0);
 	    curLength=0;
@@ -66,15 +66,17 @@ public class LimitedEditTextControl extends RelativeLayout {
 	    {
 	    	etText.setBackgroundResource(background);
 	    }
+	    //获取屏幕密度
+	    float density=DisPlayMetricsUtils.getDensity(mContext);
 	    if(textSize!=0)
 	    {
-	    	etText.setTextSize(textSize);
+	    	etText.setTextSize(textSize/density);
 	    }
 	    if(tiptextSize!=0)
 	    {
-	    	curText.setTextSize(tiptextSize);
-	    	signText.setTextSize(tiptextSize);
-	    	maxText.setTextSize(tiptextSize);
+	    	curText.setTextSize(tiptextSize/density);
+	    	signText.setTextSize(tiptextSize/density);
+	    	maxText.setTextSize(tiptextSize/density);
 	    }
 	    
 	    maxText.setText(maxLength.toString());

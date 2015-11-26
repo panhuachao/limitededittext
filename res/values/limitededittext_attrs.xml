@@ -14,8 +14,8 @@
          <!--背景 -->
         <attr name="background" format="reference" /> 
         <!--编辑框字体大小 -->
-        <attr name="textSize" format="float" />
+        <attr name="textSize" format="dimension" />
         <!--提示字体大小 -->
-        <attr name="tipTextSize" format="float" />
+        <attr name="tipTextSize" format="dimension" />
      </declare-styleable>
 </resources>
