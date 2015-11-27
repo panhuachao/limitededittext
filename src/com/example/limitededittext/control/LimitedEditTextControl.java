@@ -6,8 +6,12 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.text.Editable;
+import android.text.Selection;
+import android.text.Spannable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -25,9 +29,16 @@ public class LimitedEditTextControl extends RelativeLayout {
 	
 	private Integer maxLength;
 	private Integer curLength;
-	
+	//输入表情前的光标位置
+    private int cursorPos;
+    //输入表情前EditText中的文本
+    private String inputAfterText;
+    //是否重置了EditText的内容
+    private boolean resetText;
+    
 	private int errorColor=Color.RED;
 	private int defColor=Color.BLACK;
+	private boolean IsShowEmotion=false;
 	
 	public LimitedEditTextControl(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -49,6 +60,7 @@ public class LimitedEditTextControl extends RelativeLayout {
 	    int maxline = typeArray.getInteger(R.styleable.limitededittext_maxLines,0);
 	    int background = typeArray.getResourceId(R.styleable.limitededittext_background,0);
 	    float textSize = typeArray.getDimension(R.styleable.limitededittext_textSize,0.0f);
+	    Log.i("textSize",textSize+"");
 	    float tiptextSize = typeArray.getDimension(R.styleable.limitededittext_tipTextSize,0.0f);
 	    
 	    maxLength = typeArray.getInteger(R.styleable.limitededittext_maxLength,0);
@@ -68,11 +80,12 @@ public class LimitedEditTextControl extends RelativeLayout {
 	    }
 	    //获取屏幕密度
 	    float density=DisPlayMetricsUtils.getDensity(mContext);
-	    if(textSize!=0)
+	    if(textSize!=0.0f)
 	    {
+	    	//除以density目的解决dimen自动乘以density问题http://blog.csdn.net/icewst/article/details/40651829
 	    	etText.setTextSize(textSize/density);
 	    }
-	    if(tiptextSize!=0)
+	    if(tiptextSize!=0.0f)
 	    {
 	    	curText.setTextSize(tiptextSize/density);
 	    	signText.setTextSize(tiptextSize/density);
@@ -81,7 +94,7 @@ public class LimitedEditTextControl extends RelativeLayout {
 	    
 	    maxText.setText(maxLength.toString());
 	    curText.setText("0");
-	    curText.setHint(hints);
+	    etText.setHint(hints);
 	    etText.addTextChangedListener(new EditTextWatcher());
 	}
 	
@@ -92,13 +105,42 @@ public class LimitedEditTextControl extends RelativeLayout {
 		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			// TODO Auto-generated method stub
-			
+			 //if (!resetText) 
+			 {
+                 cursorPos = etText.getSelectionEnd();
+                 // 这里用s.toString()而不直接用s是因为如果用s，
+                 // 那么，inputAfterText和s在内存中指向的是同一个地址，s改变了，
+                 // inputAfterText也就改变了，那么表情过滤就失败了
+                 inputAfterText= s.toString();
+                 Log.i("inputAfterText", inputAfterText);
+             }
 		}
 
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
 			// TODO Auto-generated method stub
-			
+                if (count >= 1&&IsShowEmotion==false) {
+                	//表情符号的字符长度最小为2,是否开启表情显示
+                	try
+                	{
+	                    CharSequence input = s.subSequence(cursorPos, cursorPos + count);
+	                    Log.i("input", input.toString());
+	                    if (containsEmoji(input.toString())) {
+	                        resetText = true;
+	                        //是表情符号就将文本还原为输入表情符号之前的内容
+	                        etText.setText(inputAfterText);
+	                        Log.i("inputAfterText", inputAfterText);
+	                        CharSequence text = etText.getText();
+	                        if (text instanceof Spannable) {
+	                            Spannable spanText = (Spannable) text;
+	                            Selection.setSelection(spanText, text.length());
+	                        }
+	                    }
+                	}catch(Exception e)
+                	{
+                		e.printStackTrace();
+                	}
+                }
 		}
 
 		@Override
@@ -135,6 +177,55 @@ public class LimitedEditTextControl extends RelativeLayout {
 		}
 	}
 	
+	/***
+	 * 设置是否显示系统emotion
+	 * @param _islimited
+	 */
+	public void setEmotionEnable(boolean _islimited)
+	{
+		IsShowEmotion=_islimited;
+	}
+	
+	/***
+	 * 设置默认背景
+	 * @param background
+	 */
+	public void setBackgroundColor(int bgcolor)
+	{
+		etText.setBackgroundColor(bgcolor);
+	}
+	
+	
+	/**
+     * 检测是否有emoji表情
+     *
+     * @param source
+     * @return
+     */
+    public static boolean containsEmoji(String source) {
+        int len = source.length();
+        for (int i = 0; i < len; i++) {
+            char codePoint = source.charAt(i);
+            if (!isEmojiCharacter(codePoint)) { //如果不能匹配,则该字符是Emoji表情
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否是Emoji
+     *
+     * @param codePoint 比较的单个字符
+     * @return
+     */
+    private static boolean isEmojiCharacter(char codePoint) {
+        return (codePoint == 0x0) || (codePoint == 0x9) || (codePoint == 0xA) ||
+                (codePoint == 0xD) || ((codePoint >= 0x20) && (codePoint <= 0xD7FF)) ||
+                ((codePoint >= 0xE000) && (codePoint <= 0xFFFD)) || ((codePoint >= 0x10000)
+                && (codePoint <= 0x10FFFF));
+    }
+    
 	/***
 	 * 设置红色
 	 */
